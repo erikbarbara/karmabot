@@ -2,13 +2,9 @@
 
 A serverless Slack App for giving (and taking) karma.
 
-> [ebarbara  9:32 PM]
+> [ebarbara  9:32 PM] foo++
 
-> foo++
-
-> [karmabot APP  9:32 PM]
-
-> _New karma for_ **foo** `6`
+> [karmabot APP  9:32 PM] _New karma for_ **foo** `6`
 
 ## Installation
 
