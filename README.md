@@ -1,11 +1,34 @@
+# Karmabot
+
+A serverless Slack App for giving (and taking) karma.
+
+> [ebarbara  9:32 PM]
+
+> foo++
+
+> [karmabot APP  9:32 PM]
+
+> _New karma for_ **foo** `6`
+
 ## Installation
 
-### Install [Architect](http://arc.codes/)
+### Prerequisites
+
+#### Install [Architect](http://arc.codes/)
 ```
 npm i -g @architect/architect
 ```
 
+#### Install and Configure AWS CLI
+[Installing the AWS CLI version 2
+](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html)
+
+[Configuration and credential file settings
+](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+
 ### Create a Slack App
+[Create new app](https://api.slack.com/apps)
+
 Minimally configure the app to start.
 
 ### Initiate and Deploy the App
@@ -22,6 +45,7 @@ Grant the following OAuth permissions to your bot:
 * `users:read`
 * `chat:write`
 * `channels:history`
+
 You may be prompted to verify your app's URL. Use the API Gateway URL from the previous step to do so.
 
 ### Add the App to Slack
@@ -29,9 +53,9 @@ Add the app to your Slack workspace. Invite the bot to whichever channels you wa
 
 ## Usage
 You can give karma to single word strings, specific people, or quoted phrases:
-* * `@ebarbara++`
-`tacos++`
-* `"we like going serverless"++`
+* `@ebarbara++`
+* `tacos++`
+* `"dragons love tacos"++`
 
 You can also load all the users so that mentions without a preceding `@` attribute karma to the intended person (`ebarbara++`):
 * `shibboleth reload` will load usernames
