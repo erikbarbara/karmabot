@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: architect-functions
+Version: 0.2.0
+Summary: Runtime helpers for Architect provisioned AWS Lambda functions
+Home-page: https://github.com/arc-repos/arc-functions-python
+Author: Brian LeRoux
+Author-email: b@brian.io
+License: Apache 2.0
+Platform: UNKNOWN
+
+UNKNOWN
+
+

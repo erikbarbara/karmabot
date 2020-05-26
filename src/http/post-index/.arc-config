@@ -1,0 +1,5 @@
+@aws
+runtime python3.7
+memory 128
+timeout 5
+# concurrency 1
