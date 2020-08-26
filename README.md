@@ -25,7 +25,11 @@ npm i -g @architect/architect
 ### Create a Slack App
 [Create new app](https://api.slack.com/apps)
 
-Minimally configure the app to start.
+Minimally configure the app to start. And add it to your Slack workspace.
+
+Once installed visit https://api.slack.com/apps/<YOURAPPID>/install-on-team and grab the `Bot User OAuth Access Token`.
+
+Similarly, visit https://api.slack.com/apps/<YOURAPPID>/general? and grab the `Signing Secret`.
 
 ### Initiate and Deploy the App
 ```
@@ -41,8 +45,16 @@ Grant the following OAuth permissions to your bot:
 * `users:read`
 * `chat:write`
 * `channels:history`
+* `groups:history` (optional if you want to use karmabot in private channels)
 
-You may be prompted to verify your app's URL. Use the API Gateway URL from the previous step to do so.
+Enable event subscriptions.
+
+You will be prompted to verify your app's URL. Use the API Gateway URL from the previous step to do so.
+
+In addition, add the following bot events:
+
+* `message:channels`
+* `message:groups`
 
 ### Add the App to Slack
 Add the app to your Slack workspace. Invite the bot to whichever channels you want to track karma.

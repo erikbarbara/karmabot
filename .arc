@@ -12,9 +12,9 @@ karma
 
 users
   encrypt true
-  name *String
+  id *String
 
 @aws
-profile default
-region us-east-2
+profile sb
+region us-east-1
 runtime python3.7

@@ -98,24 +98,21 @@ def handler(req, context):
   event_user = '<@{}>'.format(event.get('user', None))
   # only respond to messages, that also aren't from bots, and that do contains ++ or --
   if event_type == 'message' and (event_subtype != 'bot_message' and not event_bot_id):
-    event_text_matches = [re.sub('\"', '', m[0]) for m in re.findall(r'((\S+|".*")(\+\+|--))', event_text)]
+    event_text_matches = [re.sub('\"|“|”', '', m[0]) for m in re.findall(r'((\S+|".*"|“.*”)(\+\+|--))', event_text)]
     if event_text_matches:
       for i in event_text_matches:
         delta = 1
         if i.endswith('--'):
           delta = -1
         i = i.replace('++', '').replace('--', '')
-        lookup_i = i
 
         # look up potential users
-        if not is_slack_user_id(i):
+        if is_slack_user_id(i):
           users_table = arc.tables.table(tablename='users')
-          ddb_item = users_table.get_item(Key={'name': i.lower()})
+          ddb_item = users_table.get_item(Key={'id': i})
           if 'Item' in ddb_item:
             item = ddb_item['Item']
-            i = item['id']
-          else:
-            lookup_i = i.lower()
+            i = item['name']
 
         # don't allow for modification of self-karma 
         if i == event_user:
@@ -123,14 +120,14 @@ def handler(req, context):
         # get and modify karma
         else:
           karma_table = arc.tables.table(tablename='karma')
-          ddb_item = karma_table.get_item(Key={'entity': lookup_i})
+          ddb_item = karma_table.get_item(Key={'entity': i})
           item = {}
           if 'Item' in ddb_item:
             item = ddb_item['Item']
             item['karma'] += delta
           else:
             item = {
-              'entity': lookup_i,
+              'entity': i,
               'karma': delta
             }
           karma_table.put_item(Item=item)

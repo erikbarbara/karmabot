@@ -1,3 +1,4 @@
 .arc-env
 sam.*
 .vscode
+node_modules/
