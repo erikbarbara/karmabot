@@ -14,6 +14,10 @@ users
   encrypt true
   id *String
 
+userids
+  encrypt true
+  name *String
+
 @aws
 profile sb
 region us-east-1

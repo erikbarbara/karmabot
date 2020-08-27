@@ -108,14 +108,22 @@ def handler(req, context):
 
         # look up potential users
         if is_slack_user_id(i):
+          user_id = i
           users_table = arc.tables.table(tablename='users')
           ddb_item = users_table.get_item(Key={'id': i})
           if 'Item' in ddb_item:
             item = ddb_item['Item']
             i = item['name']
+        else:
+          user_id = None
+          userids_table = arc.tables.table(tablename='userids')
+          ddb_item = userids_table.get_item(Key={'name': i})
+          if 'Item' in ddb_item:
+            item = ddb_item['Item']
+            user_id = item['id']
 
         # don't allow for modification of self-karma 
-        if i == event_user:
+        if user_id and user_id == event_user:
           response_text = '{}, {}'.format('Let go of your ego' if delta>0 else 'Hang on to your ego', event_user)
         # get and modify karma
         else:
@@ -138,12 +146,15 @@ def handler(req, context):
     elif event_text == 'shibboleth reload':
       users = get_slack_users_list()
       users_table = arc.tables.table(tablename='users')
-      for i in users:
-        if i.get('name'):
-          item = {
-            'name': i['name'],
-            'id': '<@{}>'.format(i['id']),
-          }
-          users_table.put_item(Item=item)
+      userids_table = arc.tables.table(tablename='userids')
+      for t in (users_table, userids_table):
+        with t.batch_writer() as batch:
+          for i in users:
+            if i.get('name') and i.get('id'):
+              item = {
+                'name': i['name'],
+                'id': '<@{}>'.format(i['id']),
+              }
+              batch.put_item(Item=item)
       post_slack_message(event_channel, 'Reloaded {} users'.format(len(users)))
   return {'statusCode': 200}
