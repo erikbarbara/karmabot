@@ -18,6 +18,11 @@ userids
   encrypt true
   name *String
 
+events
+  encrypt true
+  id *String
+  ttl TTL
+
 @aws
 profile sb
 region us-east-1
