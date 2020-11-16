@@ -14,18 +14,24 @@ SLACK_API_BASE_URL = 'https://slack.com/api/'
 SLACK_OAUTH_ACCESS_TOKEN = environ['SLACK_OAUTH_ACCESS_TOKEN']
 SLACK_SIGNING_SECRET = environ['SLACK_SIGNING_SECRET']
 
+SPECIAL_KARMA = {
+    1: ':one: The journey of :1000: karma begins with one.',
+    100: ':whoa_keanu: Welcome to the :100: club!',
+    1000: ':1000: Lifer. You can check out anytime you want, but you can never leave.',
+}
+
 # https://api.slack.com/authentication/verifying-requests-from-slack#a_recipe_for_security
 def validate_slack_request(headers, body):
-    if 'X-Slack-Request-Timestamp' not in headers or 'X-Slack-Signature' not in headers:
+    if 'x-slack-request-timestamp' not in headers or 'x-slack-signature' not in headers:
         return False
-    timestamp = headers['X-Slack-Request-Timestamp']
+    timestamp = headers['x-slack-request-timestamp']
     if abs(time.time() - int(timestamp)) > 60 * 5:
         return False
     sig_basestring = 'v0:' + timestamp + ':' + body
     req_hash = 'v0=' + hmac.new(str.encode(
         SLACK_SIGNING_SECRET),
         str.encode(sig_basestring), hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(req_hash, headers['X-Slack-Signature']):
+    if not hmac.compare_digest(req_hash, headers['x-slack-signature']):
         return False
     return True
 
@@ -110,13 +116,13 @@ def handler(req, context):
             }
             events_table.put_item(Item=item)
 
-            event_text_matches = [re.sub('\"|“|”', '', m[0]) for m in re.findall(r'((\S+|".*"|“.*”)(\+\+|--))', str(event_text))]
+            event_text_matches = [re.sub('\"|“|”', '', m[0]) for m in re.findall(r'((\S+|".*"|“.*”)[ ]?(\+\+|--))', str(event_text))]
             if event_text_matches:
                 for i in event_text_matches:
                     delta = 1
                     if i.endswith('--'):
                         delta = -1
-                    i = i.replace('++', '').replace('--', '')
+                    i = re.sub(' ?((\+\+)|(\-\-))', '', i)
 
                     # look up potential users
                     if is_slack_user_id(i):
@@ -151,7 +157,9 @@ def handler(req, context):
                                 'karma': delta
                             }
                         karma_table.put_item(Item=item)
-                        response_text = '_New karma for_ *{}* `{}`'.format(i, item['karma'])
+                        response_text = ':sparkles: _New karma for_ *{}* `{}`'.format(i, item['karma'])
+                        if SPECIAL_KARMA.get(item['karma']):
+                            response_text += f"\n{SPECIAL_KARMA[item['karma']]}"
                     # post to channel
                     post_slack_message(event_channel, response_text)
             # reload all users

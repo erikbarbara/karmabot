@@ -24,6 +24,6 @@ events
   ttl TTL
 
 @aws
-profile sb
-region us-east-1
+profile dgdev
+region us-west-2
 runtime python3.7
