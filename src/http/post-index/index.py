@@ -16,6 +16,8 @@ SLACK_SIGNING_SECRET = environ['SLACK_SIGNING_SECRET']
 
 SPECIAL_KARMA = {
     1: ':one: The journey of :1000: karma begins with one.',
+    20: 'Twenty karma! You\'re cooking with gas now.',
+    50: 'Look at you, you helpful person.',
     100: ':whoa_keanu: Welcome to the :100: club!',
     1000: ':1000: Lifer. You can check out anytime you want, but you can never leave.',
 }
@@ -157,7 +159,7 @@ def handler(req, context):
                                 'karma': delta
                             }
                         karma_table.put_item(Item=item)
-                        response_text = ':sparkles: _New karma for_ *{}* `{}`'.format(i, item['karma'])
+                        response_text = ':karmabot: _New karma for_ *{}* `{}`'.format(i, item['karma'])
                         if SPECIAL_KARMA.get(item['karma']):
                             response_text += f"\n{SPECIAL_KARMA[item['karma']]}"
                     # post to channel
