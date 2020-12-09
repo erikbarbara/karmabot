@@ -135,6 +135,7 @@ def handler(req, context):
                             item = ddb_item['Item']
                             i = item['name']
                     else:
+                        i = i.lower()
                         user_id = None
                         userids_table = arc.tables.table(tablename='userids')
                         ddb_item = userids_table.get_item(Key={'name': i})
