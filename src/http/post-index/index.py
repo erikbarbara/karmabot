@@ -165,6 +165,18 @@ def handler(req, context):
                             response_text += f"\n{SPECIAL_KARMA[item['karma']]}"
                     # post to channel
                     post_slack_message(event_channel, response_text)
+            # display karma
+            elif event_text.startswith('karma '):
+                item = event_text[len('karma '):]
+                karma_table = arc.tables.table(tablename='karma')
+                ddb_item = karma_tabel.get_item(Key={'entity': i})
+                if 'Item' in ddb_item:
+                    item = ddb_item['Item']
+                    karma = item['karma']
+                    response_text = f':karmabot: _Karma for_ *{item}* `{karma}`'
+                else:
+                    response_text = f':karmabot: _No karma for_ *{item}*'
+                post_slack_message(event_channel, response_text)
             # reload all users
             elif event_text == 'shibboleth reload':
                 users = get_slack_users_list()
