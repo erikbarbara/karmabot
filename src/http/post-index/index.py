@@ -169,7 +169,7 @@ def handler(req, context):
             elif event_text.startswith('karma '):
                 item = event_text[len('karma '):]
                 karma_table = arc.tables.table(tablename='karma')
-                ddb_item = karma_tabel.get_item(Key={'entity': i})
+                ddb_item = karma_table.get_item(Key={'entity': i})
                 if 'Item' in ddb_item:
                     item = ddb_item['Item']
                     karma = item['karma']
