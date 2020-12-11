@@ -167,15 +167,15 @@ def handler(req, context):
                     post_slack_message(event_channel, response_text)
             # display karma
             elif event_text.startswith('karma '):
-                item = event_text[len('karma '):]
+                entity = event_text[len('karma '):]
                 karma_table = arc.tables.table(tablename='karma')
-                ddb_item = karma_table.get_item(Key={'entity': i})
+                ddb_item = karma_table.get_item(Key={'entity': entity})
                 if 'Item' in ddb_item:
                     item = ddb_item['Item']
                     karma = item['karma']
-                    response_text = f':karmabot: _Karma for_ *{item}* `{karma}`'
+                    response_text = f':karmabot: _Karma for_ *{entity}* `{karma}`'
                 else:
-                    response_text = f':karmabot: _No karma for_ *{item}*'
+                    response_text = f':karmabot: _No karma for_ *{entity}*'
                 post_slack_message(event_channel, response_text)
             # reload all users
             elif event_text == 'shibboleth reload':
