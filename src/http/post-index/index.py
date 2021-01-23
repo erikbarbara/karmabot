@@ -15,9 +15,13 @@ SLACK_OAUTH_ACCESS_TOKEN = environ['SLACK_OAUTH_ACCESS_TOKEN']
 SLACK_SIGNING_SECRET = environ['SLACK_SIGNING_SECRET']
 
 SPECIAL_KARMA = {
+    -1: ':yoda: Fear is the path to the dark side. Fear leads to anger. Anger leads to hate. Hate leads to suffering. :darth_vader:',
     1: ':one: The journey of :1000: karma begins with one.',
+    8: 'That\'s one byte of karma. Mazel tov!',
     20: 'Twenty karma! You\'re cooking with gas now.',
+    42: 'Ah, the answer. But what is the question?',
     50: 'Look at you, you helpful person.',
+    84: ':happymac: On January 24th Apple Computer will introduce Macintosh...',
     100: ':whoa_keanu: Welcome to the :100: club!',
     1000: ':1000: Lifer. You can check out anytime you want, but you can never leave.',
 }
