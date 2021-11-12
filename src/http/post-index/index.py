@@ -142,7 +142,8 @@ def handler(req, context):
                 # don't allow for modification of self-karma
                 print(f"i: {i}")
                 print(f"event_user: {event_user}")
-                if i == event_user:
+                print(f"item: {item['id']}")
+                if item["id"] == event_user:
                     response_text = "{}, {}".format(
                         "Let go of your ego!!"
                         if delta > 0
