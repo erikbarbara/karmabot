@@ -24,7 +24,7 @@ events
   ttl TTL
 
 @aws
-profile dgdev
-region us-west-2
+profile default
+region us-east-1
 runtime python3.7
 timeout 20
