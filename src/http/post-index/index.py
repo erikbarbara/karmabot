@@ -115,15 +115,16 @@ def handler(req, context):
         print(event_text)
         event_text_matches = [
             re.sub('"|"|"', "", m[0])
-            for m in re.findall(r'((\S+|".*"|".*")(\+\+|--))', event_text)
+            for m in re.findall(r'((\s+|".*"|".*")?(\+\+|--))', event_text)
         ]
         if event_text_matches:
             print(f"event_text_matches: {event_text_matches}")
             for i in event_text_matches:
                 delta = 1
-                if i.endswith("--"):
+                if re.findall(r"\s?\-\-$"):
                     delta = -1
-                i = i.replace("++", "").replace("--", "")
+                i = re.sub(r"\s?\+\+", "", i)
+                i = re.sub(r"\s?\-\-", "", i)
 
                 # look up potential users
                 if is_slack_user_id(i):
@@ -142,7 +143,9 @@ def handler(req, context):
                 print(f"event_user: {event_user}")
                 if i == event_user:
                     response_text = "{}, {}".format(
-                        "Let go of your ego" if delta > 0 else "Hang on to your ego",
+                        "Let go of your ego!!"
+                        if delta > 0
+                        else "Hang on to your ego!!",
                         event_user,
                     )
                 # get and modify karma
