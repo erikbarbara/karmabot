@@ -123,8 +123,8 @@ def handler(req, context):
                 delta = 1
                 if re.findall(r"\s?\-\-$", i):
                     delta = -1
-                # hack
-                i = i.replace("\s", "")
+                # hack all the things
+                i = i.replace(" ", "")
                 i = i.replace("++", "").replace("--", "")
                 # endhack
                 # look up potential users
