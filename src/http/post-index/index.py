@@ -121,7 +121,7 @@ def handler(req, context):
             print(f"event_text_matches: {event_text_matches}")
             for i in event_text_matches:
                 delta = 1
-                if re.findall(r"\s?\-\-$"):
+                if re.findall(r"\s?\-\-$", i):
                     delta = -1
                 i = re.sub(r"\s?\+\+", "", i)
                 i = re.sub(r"\s?\-\-", "", i)
