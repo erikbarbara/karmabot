@@ -112,7 +112,8 @@ def handler(req, context):
     if event_type == "message" and (
         event_subtype != "bot_message" and not event_bot_id
     ):
-        print(event_text)
+        print(f"event text: {event_text})")
+        event_text = event_text.replace(" ", "")
         event_text_matches = [
             re.sub('"|"|"', "", m[0])
             for m in re.findall(r'((\S+|".*"|".*")(\+\+|--))', event_text)
