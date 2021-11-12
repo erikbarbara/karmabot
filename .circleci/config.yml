@@ -1,0 +1,32 @@
+version: 2.1
+
+orbs:
+  slack: circleci/slack@3.4.2
+
+jobs:
+  build-and-deploy:
+    docker:
+      - image: cimg/node:16.5
+    steps:
+      - checkout
+      - run:
+          name: Install architect
+          command: |
+            npm i @architect/architect
+            arc init
+            arc env production SLACK_SIGNING_SECRET ${SLACK_SIGNING_SECRET}
+            arc env production SLACK_OAUTH_ACCESS_TOKEN ${SLACK_OAUTH_ACCESS_TOKEN}
+      - run:
+        name: Deploy
+        command: |
+          arc deploy production
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - build-and-deploy:
+        filters:
+          branches:
+            only:
+              - master
