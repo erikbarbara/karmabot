@@ -17,16 +17,16 @@ jobs:
             arc env production SLACK_SIGNING_SECRET ${SLACK_SIGNING_SECRET}
             arc env production SLACK_OAUTH_ACCESS_TOKEN ${SLACK_OAUTH_ACCESS_TOKEN}
       - run:
-        name: Deploy
-        command: |
-          arc deploy production
+          name: Deploy
+          command: |
+            arc deploy production
 
 workflows:
   version: 2
   build:
     jobs:
       - build-and-deploy:
-        filters:
-          branches:
-            only:
-              - master
+          filters:
+            branches:
+              only:
+                - master
