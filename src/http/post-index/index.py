@@ -115,7 +115,7 @@ def handler(req, context):
         print(event_text)
         event_text_matches = [
             re.sub('"|"|"', "", m[0])
-            for m in re.findall(r'((\s+|".*"|".*")?(\+\+|--))', event_text)
+            for m in re.findall(r'((\S+|".*"|".*")(\+\+|--))', event_text)
         ]
         if event_text_matches:
             print(f"event_text_matches: {event_text_matches}")
@@ -123,9 +123,10 @@ def handler(req, context):
                 delta = 1
                 if re.findall(r"\s?\-\-$", i):
                     delta = -1
-                i = re.sub(r"\s?\+\+", "", i)
-                i = re.sub(r"\s?\-\-", "", i)
-
+                # hack
+                i = i.replace("\s", "")
+                i = i.replace("++", "").replace("--", "")
+                # endhack
                 # look up potential users
                 if is_slack_user_id(i):
                     users_table = arc.tables.table(tablename="users")
