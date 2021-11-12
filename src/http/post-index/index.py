@@ -131,7 +131,7 @@ def handler(req, context):
                 # endhack
                 # look up potential users
 
-                delta *= randrange(100)
+                delta *= randrange(10)
                 if is_slack_user_id(i):
                     users_table = arc.tables.table(tablename="users")
                     ddb_item = users_table.get_item(Key={"id": i})
