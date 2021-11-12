@@ -7,6 +7,7 @@ import time
 
 from os import environ
 from urllib import parse, request
+from random import randrange
 
 import arc.tables
 
@@ -129,6 +130,8 @@ def handler(req, context):
                 i = i.replace("++", "").replace("--", "")
                 # endhack
                 # look up potential users
+
+                delta *= randrange(100)
                 if is_slack_user_id(i):
                     users_table = arc.tables.table(tablename="users")
                     ddb_item = users_table.get_item(Key={"id": i})
