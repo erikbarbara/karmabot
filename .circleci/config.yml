@@ -14,8 +14,6 @@ jobs:
           command: |
             npm i @architect/architect
             npx arc init
-            npx arc env production SLACK_SIGNING_SECRET ${SLACK_SIGNING_SECRET}
-            npx arc env production SLACK_OAUTH_ACCESS_TOKEN ${SLACK_OAUTH_ACCESS_TOKEN}
       - run:
           name: Deploy
           command: |
