@@ -12,7 +12,7 @@ jobs:
       - run:
           name: Install architect
           command: |
-            npm i @architect/architect
+            npm i @architect/architect -g
             arc init
             arc env production SLACK_SIGNING_SECRET ${SLACK_SIGNING_SECRET}
             arc env production SLACK_OAUTH_ACCESS_TOKEN ${SLACK_OAUTH_ACCESS_TOKEN}
