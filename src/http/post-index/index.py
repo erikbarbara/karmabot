@@ -201,8 +201,8 @@ def reload_users(event):
     post_slack_message(event.channel, "Reloaded {} users".format(len(users)))
 
 
-def get_event_actions(event):
-    event_text = event.text.replace(" ", "")
+def get_event_actions(event_text):
+    event_text = event_text.replace(" ", "")
     return [
         re.sub('"|"|"', "", m[0])
         for m in re.findall(r'((\S+|".*"|".*")(\+\+|--))', event_text)
