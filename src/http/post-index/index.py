@@ -123,7 +123,7 @@ def handler(req, context):
         reload_users(event_channel)
         return {"statusCode": 200}
 
-    event_text_matches = get_events()
+    event_text_matches = get_events(event_text)
 
     if not event_text_matches:
         return
