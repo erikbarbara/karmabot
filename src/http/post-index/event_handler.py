@@ -70,6 +70,8 @@ class EventHandler:
             f"{user.karma}, {user.name}" for user in leaderboard
         ].join("\n")
 
+        print(f"formatted_leaderboard: {formatted_leaderboard}")
+
         self.slack_api.post_slack_message(event.channel, formatted_leaderboard)
 
     def _handle_legacy_karma_actions(self, event):
