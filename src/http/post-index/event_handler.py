@@ -75,8 +75,13 @@ class EventHandler:
         )
 
     def _handle_legacy_karma_actions(self, event):
-        actions = self._get_event_actions(event.text)
 
+        delta = self.get_delta(event.text)
+        user = self.get_user(event.text)
+        print(f"delta: {delta}")
+        print(f"user: {user}")
+
+        actions = self._get_event_actions(event.text)
         if not actions:
             return
 
@@ -108,13 +113,11 @@ class EventHandler:
             print(f"event_user: {event_user}")
             print(f"item: {item['id']}")
             a = False
-            if a == True:
-                pass
-            # if item["id"] == event_user:
-            #     response_text = "{}, {}".format(
-            #         "Let go of your ego" if delta > 0 else "Hang on to your ego",
-            #         event_user,
-            #     )
+            if item["id"] == event_user:
+                response_text = "{}, {}".format(
+                    "Let go of your ego" if delta > 0 else "Hang on to your ego",
+                    event_user,
+                )
             # get and modify karma
             else:
                 karma_table = arc.tables.table(tablename="karma")
@@ -130,6 +133,17 @@ class EventHandler:
                 response_text = "_New karma for_ *{}* `{}`".format(i, item["karma"])
             # post to channel
             self.slack_api.post_slack_message(event.channel, response_text)
+
+    def get_delta(self, text):
+        delta = 1
+        if re.findall(r"\s?\-\-$", text):
+            delta = -1
+        return delta
+
+    def get_user(self, text):
+        users_table = arc.tables.table(tablename="users")
+        ddb_item = users_table.get_item(Key={"id": text})
+        return ddb_item["Item"]["name"]
 
     def _get_event_actions(self, event_text):
         event_text = event_text.replace(" ", "")
