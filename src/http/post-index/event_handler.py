@@ -142,7 +142,9 @@ class EventHandler:
 
     def get_user(self, text):
         users_table = arc.tables.table(tablename="users")
+        print(f"text: {text}")
         ddb_item = users_table.get_item(Key={"id": text})
+        print(f"ddb_item: {ddb_item}")
         return ddb_item["Item"]["name"]
 
     def _get_event_actions(self, event_text):
