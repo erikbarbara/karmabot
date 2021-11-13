@@ -8,7 +8,7 @@ from event import Event
 
 class EventType(Enum):
     RELOAD_USERS = "shibboleth reload"
-    TESTING = "testing"
+    LEADERBOARD = "!leaderboard"
 
     def __eq__(self, other):
         return self.value == other
@@ -30,11 +30,35 @@ class EventHandler:
     def handle_message(self, event: Event):
         if event.text == EventType.RELOAD_USERS:
             self._reload_users(event)
-            return {"statusCode": 200}
-        elif event.text == EventType.TESTING:
-            self.slack_api.post_slack_message(event.channel, "just testing...")
+        elif event.text == EventType.LEADERBOARD:
+            self.show_leaderboard()
+            # self.slack_api.post_slack_message(event.channel, "just testing...")
         else:
             self._handle_legacy_karma_actions(event)
+
+    def _reload_users(self, event):
+        users = self.slack_api.get_slack_users_list()
+        users_table = arc.tables.table(tablename="users")
+        for i in users:
+            if i.get("name"):
+                item = {
+                    "name": i["name"],
+                    "id": "<@{}>".format(i["id"]),
+                }
+                users_table.put_item(Item=item)
+        self.slack_api.post_slack_message(event.channel, f"Reloaded {len(users)} users")
+
+    def _show_leaderboard():
+        users_table = arc.tables.table(tablename="users")
+        response = users_table.scan()
+        items = response["Items"]
+
+        # Prints All the Items at once
+        print(items)
+
+        # Prints Items line by line
+        for i, j in enumerate(items):
+            print(f"Num: {i} --> {j}")
 
     def _handle_legacy_karma_actions(self, event):
         actions = self._get_event_actions(event.text)
@@ -98,15 +122,3 @@ class EventHandler:
 
     def _is_slack_user_id(self, s):
         return re.match("<@((U|W)\w+)>", s)
-
-    def _reload_users(self, event):
-        users = self.slack_api.get_slack_users_list()
-        users_table = arc.tables.table(tablename="users")
-        for i in users:
-            if i.get("name"):
-                item = {
-                    "name": i["name"],
-                    "id": "<@{}>".format(i["id"]),
-                }
-                users_table.put_item(Item=item)
-        self.slack_api.post_slack_message(event.channel, f"Reloaded {len(users)} users")

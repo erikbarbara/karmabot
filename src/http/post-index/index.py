@@ -24,6 +24,7 @@ def handler(request, context):
             return {"statusCode": 400}
 
         event_handler.handle_message(event)
+
         return {"statusCode": 200}
     except Exception as error:
         print(f"error: {error}")
