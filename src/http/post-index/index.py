@@ -109,75 +109,90 @@ def handler(req, context):
     event_subtype = event.get("subtype", None)
     event_text = event.get("text", None)
     event_user = "<@{}>".format(event.get("user", None))
-    # only respond to messages, that also aren't from bots, and that do contains ++ or --
-    if event_type == "message" and (
-        event_subtype != "bot_message" and not event_bot_id
-    ):
-        print(f"event text: {event_text})")
-        event_text = event_text.replace(" ", "")
-        event_text_matches = [
-            re.sub('"|"|"', "", m[0])
-            for m in re.findall(r'((\S+|".*"|".*")(\+\+|--))', event_text)
-        ]
-        if event_text_matches:
-            print(f"event_text_matches: {event_text_matches}")
-            for i in event_text_matches:
-                delta = 1
-                if re.findall(r"\s?\-\-$", i):
-                    delta = -1
-                # hack all the things
-                i = i.replace(" ", "")
-                i = i.replace("++", "").replace("--", "")
-                # endhack
-                # look up potential users
 
-                delta *= randrange(10)
-                if is_slack_user_id(i):
-                    users_table = arc.tables.table(tablename="users")
-                    ddb_item = users_table.get_item(Key={"id": i})
-                    print(f"user tables: {users_table}")
-                    if "Item" in ddb_item:
-                        item = ddb_item["Item"]
-                        print(f"ddb_item[Item]: {ddb_item['Item']}")
-                        print(f"is_slack_user_id (i) - before: {i}")
-                        i = item["name"]
-                        print(f"is_slack_user_id (i) - after: {i}")
+    if not valid_message(event_type, event_subtype, event_bot_id):
+        return {"statusCode": 400}
 
-                # don't allow for modification of self-karma
-                print(f"i: {i}")
-                print(f"event_user: {event_user}")
-                print(f"item: {item['id']}")
-                if item["id"] == event_user:
-                    response_text = "{}, {}".format(
-                        "Let go of your ego!!"
-                        if delta > 0
-                        else "Hang on to your ego!!",
-                        event_user,
-                    )
-                # get and modify karma
-                else:
-                    karma_table = arc.tables.table(tablename="karma")
-                    ddb_item = karma_table.get_item(Key={"entity": i})
-                    item = {}
-                    if "Item" in ddb_item:
-                        item = ddb_item["Item"]
-                        item["karma"] += delta
-                    else:
-                        item = {"entity": i, "karma": delta}
-                    karma_table.put_item(Item=item)
-                    response_text = "_New karma for_ *{}* `{}`".format(i, item["karma"])
-                # post to channel
-                post_slack_message(event_channel, response_text)
-        # reload all users
-        elif event_text == "shibboleth reload":
-            users = get_slack_users_list()
+    if event_text == "shibboleth reload":
+        reload_users(event_channel)
+        return {"statusCode": 200}
+
+    event_text_matches = get_events()
+
+    if not event_text_matches:
+        return
+
+    for i in event_text_matches:
+        delta = 1
+        if re.findall(r"\s?\-\-$", i):
+            delta = -1
+        # hack all the things
+        i = i.replace(" ", "")
+        i = i.replace("++", "").replace("--", "")
+        # endhack
+        # look up potential users
+
+        delta *= randrange(100)
+        if is_slack_user_id(i):
             users_table = arc.tables.table(tablename="users")
-            for i in users:
-                if i.get("name"):
-                    item = {
-                        "name": i["name"],
-                        "id": "<@{}>".format(i["id"]),
-                    }
-                    users_table.put_item(Item=item)
-            post_slack_message(event_channel, "Reloaded {} users".format(len(users)))
+            ddb_item = users_table.get_item(Key={"id": i})
+            print(f"user tables: {users_table}")
+            if "Item" in ddb_item:
+                item = ddb_item["Item"]
+                print(f"ddb_item[Item]: {ddb_item['Item']}")
+                print(f"is_slack_user_id (i) - before: {i}")
+                i = item["name"]
+                print(f"is_slack_user_id (i) - after: {i}")
+
+        # don't allow for modification of self-karma
+        print(f"i: {i}")
+        print(f"event_user: {event_user}")
+        print(f"item: {item['id']}")
+        if item["id"] == event_user:
+            response_text = "{}, {}".format(
+                "Let go of your ego!!" if delta > 0 else "Hang on to your ego!!",
+            )
+        # get and modify karma
+        else:
+            karma_table = arc.tables.table(tablename="karma")
+            ddb_item = karma_table.get_item(Key={"entity": i})
+            item = {}
+            if "Item" in ddb_item:
+                item = ddb_item["Item"]
+                item["karma"] += delta
+            else:
+                item = {"entity": i, "karma": delta}
+            karma_table.put_item(Item=item)
+            response_text = "_New karma for_ *{}* `{}`".format(i, item["karma"])
+        # post to channel
+        post_slack_message(event_channel, response_text)
+
     return {"statusCode": 200}
+
+
+def valid_message(event_type, event_subtype, event_bot_id):
+    # only respond to messages, that also aren't from bots
+    is_message = event_type == "message"
+    is_from_human = event_subtype != "bot_message" and not event_bot_id
+    return is_message and is_from_human
+
+
+def reload_users(event_channel):
+    users = get_slack_users_list()
+    users_table = arc.tables.table(tablename="users")
+    for i in users:
+        if i.get("name"):
+            item = {
+                "name": i["name"],
+                "id": "<@{}>".format(i["id"]),
+            }
+            users_table.put_item(Item=item)
+    post_slack_message(event_channel, "Reloaded {} users".format(len(users)))
+
+
+def get_events(event_text):
+    event_text = event_text.replace(" ", "")
+    return [
+        re.sub('"|"|"', "", m[0])
+        for m in re.findall(r'((\S+|".*"|".*")(\+\+|--))', event_text)
+    ]
