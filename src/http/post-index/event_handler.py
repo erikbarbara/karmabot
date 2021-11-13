@@ -58,15 +58,18 @@ class EventHandler:
         leaderboard = []
         for user in users:
             user_karma = karma_table.get_item(Key={"entity": user["id"]})
+            print(f"user_karma: {user_karma}")
             if "Item" not in user_karma:
                 continue
 
             user = User(name=user["name"], karma=user_karma["Item"]["karma"])
+            print(f"user: {user}")
             leaderboard.append(user)
         leaderboard.sort(key=lambda u: u.karma)
+        print(f"leaderboard: {leaderboard}")
 
         formatted_leaderboard = [f"{user.karma}, {user.name}" for user in leaderboard]
-        print(formatted_leaderboard)
+        print(f"formatted_leaderboard: {formatted_leaderboard}")
 
     def _handle_legacy_karma_actions(self, event):
         actions = self._get_event_actions(event.text)
