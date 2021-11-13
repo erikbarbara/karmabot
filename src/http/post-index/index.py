@@ -104,29 +104,20 @@ def handler(req, context):
             "body": json.dumps({"challenge": body["challenge"]}),
         }
 
-    event = body.get("event", {})
-    event_bot_id = event.get("bot_id", None)
-    event_channel = event.get("channel", None)
-    event_type = event.get("type", None)
-    event_subtype = event.get("subtype", None)
-    event_text = event.get("text", None)
+    event = make_event(body.get("event", {}))
     event_user = "<@{}>".format(event.get("user", None))
 
-    if not event_text:
+    if not event.text:
         return {"statusCode": 200}
 
-    e = make_event(event)
-    print("Event", e)
-    print("Event", e.text)
-
-    if not valid_message(event_type, event_subtype, event_bot_id):
+    if not valid_message(event):
         return {"statusCode": 400}
 
-    if event_text == "shibboleth reload":
-        reload_users(event_channel)
+    if event.text == "shibboleth reload":
+        reload_users(event)
         return {"statusCode": 200}
 
-    event_text_matches = get_events(event_text)
+    event_text_matches = get_event_actions(event.text)
 
     if not event_text_matches:
         return
@@ -190,14 +181,14 @@ def make_event(event):
     )
 
 
-def valid_message(event_type, event_subtype, event_bot_id):
+def valid_message(event):
     # only respond to messages, that also aren't from bots
-    is_message = event_type == "message"
-    is_from_human = event_subtype != "bot_message" and not event_bot_id
+    is_message = event.type == "message"
+    is_from_human = event.subtype != "bot_message" and not event.bot_id
     return is_message and is_from_human
 
 
-def reload_users(event_channel):
+def reload_users(event):
     users = get_slack_users_list()
     users_table = arc.tables.table(tablename="users")
     for i in users:
@@ -207,11 +198,11 @@ def reload_users(event_channel):
                 "id": "<@{}>".format(i["id"]),
             }
             users_table.put_item(Item=item)
-    post_slack_message(event_channel, "Reloaded {} users".format(len(users)))
+    post_slack_message(event.channel, "Reloaded {} users".format(len(users)))
 
 
-def get_events(event_text):
-    event_text = event_text.replace(" ", "")
+def get_event_actions(event):
+    event_text = event.text.replace(" ", "")
     return [
         re.sub('"|"|"', "", m[0])
         for m in re.findall(r'((\S+|".*"|".*")(\+\+|--))', event_text)
