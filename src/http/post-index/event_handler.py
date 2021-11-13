@@ -65,6 +65,8 @@ class EventHandler:
             user = User(name=user["name"], karma=user_karma["Item"]["karma"])
             print(f"user: {user}")
             leaderboard.append(user)
+
+        print(f"leaderboard: {leaderboard}")
         leaderboard.sort(key=lambda u: u.karma)
         print(f"leaderboard: {leaderboard}")
 
