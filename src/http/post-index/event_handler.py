@@ -49,16 +49,13 @@ class EventHandler:
         self.slack_api.post_slack_message(event.channel, f"Reloaded {len(users)} users")
 
     def _show_leaderboard(self):
+        karma_table = arc.tables.table(tablename="karma")
         users_table = arc.tables.table(tablename="users")
         response = users_table.scan()
-        items = response["Items"]
-
-        # Prints All the Items at once
-        print(items)
-
-        # Prints Items line by line
-        for i, j in enumerate(items):
-            print(f"Num: {i} --> {j}")
+        users = response["Items"]
+        for user in users:
+            user_karma = karma_table.get_item(Key={"entity": user["id"]})
+            print(f"user: {user}, user_karma: {user_karma}")
 
     def _handle_legacy_karma_actions(self, event):
         actions = self._get_event_actions(event.text)
