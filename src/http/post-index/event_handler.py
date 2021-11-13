@@ -35,7 +35,7 @@ class EventHandler:
             self._show_leaderboard(event)
             # self.slack_api.post_slack_message(event.channel, "just testing...")
         else:
-            self._handle_legacy_karma_actions(event)
+            self._update_karma(event)
 
     def _reload_users(self, event):
         users = self.slack_api.get_slack_users_list()
@@ -74,7 +74,7 @@ class EventHandler:
             event.channel, f"Current leaderboard:\n {formatted_leaderboard}"
         )
 
-    def _handle_legacy_karma_actions(self, event):
+    def _update_karma(self, event):
         delta = self._get_delta(event.text)
         user_string = self._get_user_string(event.text)
         user = self._get_user(user_string)
@@ -87,9 +87,23 @@ class EventHandler:
                 else f"Hang on to your ego, {user_id}"
             )
             self.slack_api.post_slack_message(event.channel, message)
-            return
+        else:
+            delta *= randrange(100)
+            karma_table = arc.tables.table(tablename="karma")
+            ddb_item = karma_table.get_item(Key={"entity": user_id})
 
+            item = {}
+            if "Item" in ddb_item:
+                item = ddb_item["Item"]
+                item["karma"] += delta
+            else:
+                item = {"entity": user_id, "karma": delta}
+            karma_table.put_item(Item=item)
+
+            response_text = f"_New karma for_ *{user_string}* `{item['karma']}`"
+            self.slack_api.post_slack_message(event.channel, response_text)
         return
+
         actions = self._get_event_actions(event.text)
         if not actions:
             return
