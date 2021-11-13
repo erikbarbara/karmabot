@@ -165,7 +165,7 @@ def handler(req, context):
             karma_table.put_item(Item=item)
             response_text = "_New karma for_ *{}* `{}`".format(i, item["karma"])
         # post to channel
-        post_slack_message(event_channel, response_text)
+        post_slack_message(event.channel, response_text)
 
     return {"statusCode": 200}
 
