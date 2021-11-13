@@ -53,26 +53,26 @@ class EventHandler:
         karma_table = arc.tables.table(tablename="karma")
         users_table = arc.tables.table(tablename="users")
         response = users_table.scan()
-        users = response["Items"]
 
         leaderboard = []
+        users = response["Items"]
         for user in users:
             user_karma = karma_table.get_item(Key={"entity": user["id"]})
             if "Item" not in user_karma:
+                # Current user has never had karma
                 continue
 
             user = User(name=user["name"], karma=user_karma["Item"]["karma"])
             leaderboard.append(user)
-
         leaderboard.sort(reverse=True, key=lambda u: u.karma)
 
         formatted_leaderboard = "\n".join(
             [f"{user.karma}, {user.name}" for user in leaderboard]
         )
 
-        print(f"formatted_leaderboard: {formatted_leaderboard}")
-
-        self.slack_api.post_slack_message(event.channel, formatted_leaderboard)
+        self.slack_api.post_slack_message(
+            event.channel, f"Current leaderboard:\n {formatted_leaderboard}"
+        )
 
     def _handle_legacy_karma_actions(self, event):
         actions = self._get_event_actions(event.text)
