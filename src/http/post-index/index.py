@@ -105,7 +105,7 @@ def handler(req, context):
         }
 
     event = make_event(body.get("event", {}))
-    event_user = "<@{}>".format(event.get("user", None))
+    event_user = f"<@{event.user}>"
 
     if not event.text:
         return {"statusCode": 200}
