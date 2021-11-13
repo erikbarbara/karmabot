@@ -107,11 +107,14 @@ class EventHandler:
             print(f"i: {i}")
             print(f"event_user: {event_user}")
             print(f"item: {item['id']}")
-            if item["id"] == event_user:
-                response_text = "{}, {}".format(
-                    "Let go of your ego" if delta > 0 else "Hang on to your ego",
-                    event_user,
-                )
+            a = False
+            if a == True:
+                pass
+            # if item["id"] == event_user:
+            #     response_text = "{}, {}".format(
+            #         "Let go of your ego" if delta > 0 else "Hang on to your ego",
+            #         event_user,
+            #     )
             # get and modify karma
             else:
                 karma_table = arc.tables.table(tablename="karma")
