@@ -4,6 +4,7 @@ import arc.tables
 from enum import Enum
 from random import randrange
 from event import Event
+from user import User
 
 
 class EventType(Enum):
@@ -53,9 +54,19 @@ class EventHandler:
         users_table = arc.tables.table(tablename="users")
         response = users_table.scan()
         users = response["Items"]
+
+        leaderboard = []
         for user in users:
             user_karma = karma_table.get_item(Key={"entity": user["id"]})
-            print(f"user: {user}, user_karma: {user_karma}")
+            if "Item" not in user_karma:
+                continue
+
+            user = User(name=user["name"], karma=user_karma["Item"]["karma"])
+            leaderboard.append(user)
+        leaderboard.sort(key=lambda u: u.karma)
+
+        formatted_leaderboard = [f"{user.karma}, {user.name}" for user in leaderboard]
+        print(formatted_leaderboard)
 
     def _handle_legacy_karma_actions(self, event):
         actions = self._get_event_actions(event.text)
