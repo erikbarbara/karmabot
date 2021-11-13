@@ -112,6 +112,9 @@ def handler(req, context):
     event_text = event.get("text", None)
     event_user = "<@{}>".format(event.get("user", None))
 
+    if not event_text:
+        return {"statusCode": 200}
+
     e = make_event(event)
     print("Event", e)
     print("Event", e.text)
