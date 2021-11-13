@@ -66,9 +66,9 @@ class EventHandler:
 
         leaderboard.sort(reverse=True, key=lambda u: u.karma)
 
-        formatted_leaderboard = [
-            f"{user.karma}, {user.name}" for user in leaderboard
-        ].join("\n")
+        formatted_leaderboard = "\n".join(
+            [f"{user.karma}, {user.name}" for user in leaderboard]
+        )
 
         print(f"formatted_leaderboard: {formatted_leaderboard}")
 
