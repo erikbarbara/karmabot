@@ -81,12 +81,12 @@ class EventHandler:
 
         user_id = user["Item"]["id"]
         if user_id == f"<@{event.user}>":
-            self.slack_api.post_slack_message(
-                event.channel,
+            message = (
                 f"Let go of your ego, {user_id}"
                 if delta > 0
-                else f"Hang on to your ego, {user_id}",
+                else f"Hang on to your ego, {user_id}"
             )
+            self.slack_api.post_slack_message(event.channel, message)
             return
 
         return
