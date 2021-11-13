@@ -68,7 +68,7 @@ class EventHandler:
 
         formatted_leaderboard = [
             f"{user.karma}, {user.name}" for user in leaderboard
-        ].join("/n")
+        ].join("\n")
 
         self.slack_api.post_slack_message(event.channel, formatted_leaderboard)
 
