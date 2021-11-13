@@ -11,6 +11,8 @@ from random import randrange
 
 import arc.tables
 
+from event import Event
+
 SLACK_API_BASE_URL = "https://slack.com/api/"
 SLACK_OAUTH_ACCESS_TOKEN = environ["SLACK_OAUTH_ACCESS_TOKEN"]
 SLACK_SIGNING_SECRET = environ["SLACK_SIGNING_SECRET"]
@@ -109,6 +111,9 @@ def handler(req, context):
     event_subtype = event.get("subtype", None)
     event_text = event.get("text", None)
     event_user = "<@{}>".format(event.get("user", None))
+
+    e = Event.from_json(event)
+    print("Event", e)
 
     if not valid_message(event_type, event_subtype, event_bot_id):
         return {"statusCode": 400}
