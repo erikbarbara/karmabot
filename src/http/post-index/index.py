@@ -159,7 +159,7 @@ def handler(req, context):
         print(f"item: {item['id']}")
         if item["id"] == event_user:
             response_text = "{}, {}".format(
-                "Let go of your ego!!" if delta > 0 else "Hang on to your ego!!"
+                "Let go of your ego" if delta > 0 else "Hang on to your ego", event_user
             )
         # get and modify karma
         else:
