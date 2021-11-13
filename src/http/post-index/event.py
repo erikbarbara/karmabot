@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
-from dataclasses_json import dataclass_json
 
 
-@dataclass_json
 @dataclass
 class Event:
     bot_id: str = field(default="")

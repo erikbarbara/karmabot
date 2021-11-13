@@ -112,8 +112,9 @@ def handler(req, context):
     event_text = event.get("text", None)
     event_user = "<@{}>".format(event.get("user", None))
 
-    e = Event.from_json(event)
+    e = make_event(event)
     print("Event", e)
+    print("Event", e.text)
 
     if not valid_message(event_type, event_subtype, event_bot_id):
         return {"statusCode": 400}
@@ -173,6 +174,17 @@ def handler(req, context):
         post_slack_message(event_channel, response_text)
 
     return {"statusCode": 200}
+
+
+def make_event(event):
+    return Event(
+        bot_id=event.get("bot_id"),
+        channel=event.get("channel"),
+        type=event.get("type"),
+        subtype=event.get("subtype"),
+        text=event.get("text"),
+        user=event.get("user"),
+    )
 
 
 def valid_message(event_type, event_subtype, event_bot_id):
