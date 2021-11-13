@@ -98,6 +98,7 @@ class EventHandler:
             # get and modify karma
             else:
                 karma_table = arc.tables.table(tablename="karma")
+                print(f"What is i: {i}")
                 ddb_item = karma_table.get_item(Key={"entity": i})
                 item = {}
                 if "Item" in ddb_item:
