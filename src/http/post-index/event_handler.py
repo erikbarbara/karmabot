@@ -31,7 +31,7 @@ class EventHandler:
         if event.text == EventType.RELOAD_USERS:
             self._reload_users(event)
         elif event.text == EventType.LEADERBOARD:
-            self.show_leaderboard()
+            self._show_leaderboard()
             # self.slack_api.post_slack_message(event.channel, "just testing...")
         else:
             self._handle_legacy_karma_actions(event)
