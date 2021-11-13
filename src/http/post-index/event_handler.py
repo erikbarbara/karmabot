@@ -48,7 +48,7 @@ class EventHandler:
                 users_table.put_item(Item=item)
         self.slack_api.post_slack_message(event.channel, f"Reloaded {len(users)} users")
 
-    def _show_leaderboard():
+    def _show_leaderboard(self):
         users_table = arc.tables.table(tablename="users")
         response = users_table.scan()
         items = response["Items"]
