@@ -16,8 +16,14 @@ jobs:
           aws-access-key-id: AWS_ACCESS_KEY_ID
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
       - run:
+          name: Create virtual environment
+          command: |
+            python3 -m venv .VENV
+            source .VENV/bin/activate
+      - run:
           name: Install requirements
           command: |
+            source .VENV/bin/activate
             pip install -r requirements.txt
       - run:
           name: Install architect
