@@ -76,8 +76,9 @@ class EventHandler:
 
     def _handle_legacy_karma_actions(self, event):
 
-        delta = self.get_delta(event.text)
-        user = self.get_user(event.text)
+        delta = self._get_delta(event.text)
+        user_string = self._get_user_string(event.text)
+        user = self._get_user(user_string)
         print(f"delta: {delta}")
         print(f"user: {user}")
 
@@ -134,16 +135,21 @@ class EventHandler:
             # post to channel
             self.slack_api.post_slack_message(event.channel, response_text)
 
-    def get_delta(self, text):
+    def _get_delta(self, text):
         delta = 1
         if re.findall(r"\s?\-\-$", text):
             delta = -1
         return delta
 
-    def get_user(self, text):
+    def _get_user_string(self, text):
+        text = text.replace(" ", "")
+        text = text.replace("++", "").replace("--", "")
+        return text
+
+    def _get_user(self, user_text):
         users_table = arc.tables.table(tablename="users")
-        print(f"text: {text}")
-        ddb_item = users_table.get_item(Key={"id": text})
+        print(f"user_text: {user_text}")
+        ddb_item = users_table.get_item(Key={"id": user_text})
         print(f"ddb_item: {ddb_item}")
         return ddb_item["Item"]["name"]
 
