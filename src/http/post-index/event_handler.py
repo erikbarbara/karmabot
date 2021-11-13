@@ -32,7 +32,7 @@ class EventHandler:
         if event.text == EventType.RELOAD_USERS:
             self._reload_users(event)
         elif event.text == EventType.LEADERBOARD:
-            self._show_leaderboard()
+            self._show_leaderboard(event)
             # self.slack_api.post_slack_message(event.channel, "just testing...")
         else:
             self._handle_legacy_karma_actions(event)
@@ -49,7 +49,7 @@ class EventHandler:
                 users_table.put_item(Item=item)
         self.slack_api.post_slack_message(event.channel, f"Reloaded {len(users)} users")
 
-    def _show_leaderboard(self):
+    def _show_leaderboard(self, event: Event):
         karma_table = arc.tables.table(tablename="karma")
         users_table = arc.tables.table(tablename="users")
         response = users_table.scan()
@@ -58,20 +58,19 @@ class EventHandler:
         leaderboard = []
         for user in users:
             user_karma = karma_table.get_item(Key={"entity": user["id"]})
-            print(f"user_karma: {user_karma}")
             if "Item" not in user_karma:
                 continue
 
             user = User(name=user["name"], karma=user_karma["Item"]["karma"])
-            print(f"user: {user}")
             leaderboard.append(user)
 
-        print(f"leaderboard: {leaderboard}")
-        leaderboard.sort(key=lambda u: u.karma)
-        print(f"leaderboard: {leaderboard}")
+        leaderboard.sort(reverse=True, key=lambda u: u.karma)
 
-        formatted_leaderboard = [f"{user.karma}, {user.name}" for user in leaderboard]
-        print(f"formatted_leaderboard: {formatted_leaderboard}")
+        formatted_leaderboard = [
+            f"{user.karma}, {user.name}" for user in leaderboard
+        ].join("/n")
+
+        self.slack_api.post_slack_message(event.channel, formatted_leaderboard)
 
     def _handle_legacy_karma_actions(self, event):
         actions = self._get_event_actions(event.text)
