@@ -7,7 +7,8 @@ orbs:
 jobs:
   build-and-deploy:
     docker:
-      - image: cimg/node:16.5
+      # - image: cimg/node:16.5
+      - image: circleci/python:3.7.4-node
     steps:
       - checkout
       - aws-cli/setup:
