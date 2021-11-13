@@ -1,8 +1,17 @@
 import re
 import arc.tables
 
+from enum import Enum
 from random import randrange
 from event import Event
+
+
+class EventType(Enum):
+    RELOAD_USERS = "shibboleth reload"
+    TESTING = "testing"
+
+    def __eq__(self, other):
+        return self.value == other
 
 
 class EventHandler:
@@ -19,16 +28,21 @@ class EventHandler:
         return is_message and is_from_human
 
     def handle_message(self, event: Event):
-        if event.text == "shibboleth reload":
+        if event.text == EventType.RELOAD_USERS:
             self._reload_users(event)
             return {"statusCode": 200}
+        elif event.text == EventType.TESTING:
+            self.slack_api.post_slack_message(event.channel, "just testing...")
+        else:
+            self._handle_legacy_karma_actions(event)
 
-        event_text_matches = self._get_event_actions(event.text)
+    def _handle_legacy_karma_actions(self, event):
+        actions = self._get_event_actions(event.text)
 
-        if not event_text_matches:
+        if not actions:
             return
 
-        for i in event_text_matches:
+        for i in actions:
             delta = 1
             if re.findall(r"\s?\-\-$", i):
                 delta = -1
