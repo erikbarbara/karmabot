@@ -94,6 +94,9 @@ class EventHandler:
         self.slack_api.post_slack_message(event.channel, f"Reloaded {len(users)} users")
 
     def _show_leaderboard(self, event: Event):
+        self.slack_api.post_slack_message(event.channel, f"Current leaderboard ...")
+        return
+
         response = self.users_table.scan()
 
         leaderboard = []
