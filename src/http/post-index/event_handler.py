@@ -2,6 +2,7 @@ import re
 import hashlib
 import arc.tables
 
+import datetime
 from enum import Enum
 from random import randrange
 from event import Event
@@ -40,10 +41,23 @@ class EventHandler:
 
         # Check if event already occurred
         event_history_table = arc.tables.table(tablename="events")
-        item = event_history_table.get_item(Key={"id": "1"})
-        print(f"item: {item}")
+        ddb_item = event_history_table.get_item(Key={"id": "1"})
+        print(f"item: {ddb_item}")
+
+        if "Item" not in ddb_item:
+            # no existing row
+            return False
 
         # if yes, was is in the last 500ms?
+        db_event_timestamp = datetime.datetime.fromtimestamp(ddb_item["Item"]["ts"])
+        db_event_treshold_timestamp = db_event_timestamp + datetime.timedelta(
+            seconds=30
+        )
+        event_timestamp = datetime.datetime.fromtimestamp(event.ts)
+        print(f"db_event_timestamp: {db_event_timestamp}")
+        print(f"db_event_treshold_timestamp: {db_event_treshold_timestamp}")
+        print(f"event_timestamp: {event_timestamp}")
+        return db_event_timestamp < event_timestamp < db_event_treshold_timestamp
 
     def handle_message(self, event: Event):
         if event.text == EventType.RELOAD_USERS:
