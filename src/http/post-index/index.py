@@ -16,24 +16,24 @@ def handler(request, context):
             return slack_api.verify_event(request_body)
 
         if not slack_api.validate_slack_request(request.get("headers"), request_body):
-            return {"statusCode": 401}
+            return {"statusCode": "401"}
 
         event = make_event(request_body)
 
         if event_handler.duplicate_message(event):
-            return {"statusCode": 200}
+            return {"statusCode": "200"}
             # return {"statusCode": 409}
 
         if not event_handler.valid_message(event):
-            return {"statusCode": 400}
+            return {"statusCode": "400"}
 
         event_handler.handle_message(event)
         event_handler.log_message(event)
 
-        return {"statusCode": 200}
+        return {"statusCode": "200"}
     except Exception as error:
         print(f"error: {error}")
-        return {"statusCode": 400}
+        return {"statusCode": "400"}
 
 
 def get_request_body(request):
