@@ -30,10 +30,11 @@ class EventHandler:
 
         # only respond to messages, that also aren't from bots
         is_message = event.type == "message"
-        is_from_human = event.subtype != "bot_message" and not event.bot_id
+        is_from_human = event.subtype != "bot_message" or not event.bot_id
         return is_message and is_from_human
 
     def duplicate_message(self, event: Event):
+        # https://aws.amazon.com/premiumsupport/knowledge-center/lambda-function-idempotent/
         computed_hash = self._compute_hash(event)
         print(f"computed_hash: {computed_hash}")
 
