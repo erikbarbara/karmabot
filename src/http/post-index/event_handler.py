@@ -33,9 +33,10 @@ class EventHandler:
 
     def duplicate_message(self, event: Event):
         # Compute hash (user + text)
-        string_to_hash = event.user + event.text
-        computed_hash = hashlib.md5(string_to_hash.encode("utf-8")).hexdigest()
-        print(f"computed_hash: {computed_hash}")
+        # string_to_hash = event.user + event.text
+        # computed_hash = hashlib.md5(string_to_hash.encode("utf-8")).hexdigest()
+        # print(f"computed_hash: {computed_hash}")
+        print(f"event: {event}")
 
         # Check if event already occurred
         event_history_table = arc.tables.table(tablename="events")
