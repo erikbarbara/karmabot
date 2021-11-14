@@ -25,13 +25,14 @@ class EventHandler:
         self.event_history_table = arc.tables.table(tablename="events")
 
     def valid_message(self, event: Event):
+        print(f"valid_message event: {event}")
         if not event.text:
             return False
 
-        # only respond to messages, that also aren't from bots
-        is_message = event.type == "message"
-        is_from_human = event.subtype != "bot_message" or not event.bot_id
-        return is_message and is_from_human
+        if event.bot_id:
+            return False
+
+        return event.type == "message"
 
     def duplicate_message(self, event: Event):
         # https://aws.amazon.com/premiumsupport/knowledge-center/lambda-function-idempotent/

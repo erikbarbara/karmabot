@@ -25,8 +25,10 @@ def handler(request, context):
             # return {"statusCode": 409}
 
         if not event_handler.valid_message(event):
+            print("here [event_handler.valid_message]")
             return {"statusCode": "400"}
 
+        print("calling handle_message")
         event_handler.handle_message(event)
         event_handler.log_message(event)
 
