@@ -20,9 +20,9 @@ def handler(request, context):
 
         event = make_event(request_body)
 
-        # if event_handler.duplicate_message(event):
-        #     return {"statusCode": 200}
-        # return {"statusCode": 409}
+        if event_handler.duplicate_message(event):
+            return {"statusCode": 200}
+            # return {"statusCode": 409}
 
         if not event_handler.valid_message(event):
             return {"statusCode": 400}

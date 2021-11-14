@@ -34,12 +34,11 @@ class EventHandler:
         return is_message and is_from_human
 
     def duplicate_message(self, event: Event):
-
-        # print(f"computed_hash: {computed_hash}")
-        print(f"event: {event}")
+        computed_hash = self._compute_hash(event)
+        print(f"computed_hash: {computed_hash}")
 
         # Check if event already occurred
-        ddb_item = self.event_history_table.get_item(Key={"id": "1"})
+        ddb_item = self.event_history_table.get_item(Key={"id": computed_hash})
         print(f"item: {ddb_item}")
 
         if "Item" not in ddb_item:
