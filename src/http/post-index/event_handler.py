@@ -49,15 +49,22 @@ class EventHandler:
             return False
 
         # if yes, was is in the last 500ms?
-        db_event_timestamp = datetime.datetime.fromtimestamp(ddb_item["Item"]["ts"])
+        db_event_timestamp = datetime.datetime.fromtimestamp(
+            float(ddb_item["Item"]["ts"])
+        )
         db_event_treshold_timestamp = db_event_timestamp + datetime.timedelta(
             seconds=30
         )
-        event_timestamp = datetime.datetime.fromtimestamp(event.ts)
+        event_timestamp = datetime.datetime.fromtimestamp(float(event.ts))
         print(f"db_event_timestamp: {db_event_timestamp}")
         print(f"db_event_treshold_timestamp: {db_event_treshold_timestamp}")
         print(f"event_timestamp: {event_timestamp}")
-        return db_event_timestamp < event_timestamp < db_event_treshold_timestamp
+
+        is_duplicate = (
+            db_event_timestamp < event_timestamp < db_event_treshold_timestamp
+        )
+        print(f"is_duplicate: {is_duplicate}")
+        return is_duplicate
 
     def handle_message(self, event: Event):
         if event.text == EventType.RELOAD_USERS:
