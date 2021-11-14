@@ -42,6 +42,7 @@ def get_request_body(request):
 def make_event(request_body):
     request_body = json.loads(request_body)
     event = request_body.get("event", {})
+    print(f"event: {event}")
 
     return Event(
         bot_id=event.get("bot_id"),
