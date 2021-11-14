@@ -22,6 +22,7 @@ class EventHandler:
         self.slack_api = slack_api
         self.users_table = arc.tables.table(tablename="users")
         self.karma_table = arc.tables.table(tablename="karma")
+        self.event_history_table = arc.tables.table(tablename="events")
 
     def valid_message(self, event: Event):
         if not event.text:
@@ -33,15 +34,12 @@ class EventHandler:
         return is_message and is_from_human
 
     def duplicate_message(self, event: Event):
-        # Compute hash (user + text)
-        # string_to_hash = event.user + event.text
-        # computed_hash = hashlib.md5(string_to_hash.encode("utf-8")).hexdigest()
+
         # print(f"computed_hash: {computed_hash}")
         print(f"event: {event}")
 
         # Check if event already occurred
-        event_history_table = arc.tables.table(tablename="events")
-        ddb_item = event_history_table.get_item(Key={"id": "1"})
+        ddb_item = self.event_history_table.get_item(Key={"id": "1"})
         print(f"item: {ddb_item}")
 
         if "Item" not in ddb_item:
@@ -61,10 +59,14 @@ class EventHandler:
         print(f"event_timestamp: {event_timestamp}")
 
         is_duplicate = (
-            db_event_timestamp < event_timestamp < db_event_treshold_timestamp
+            db_event_timestamp <= event_timestamp <= db_event_treshold_timestamp
         )
         print(f"is_duplicate: {is_duplicate}")
         return is_duplicate
+
+    def _compute_hash(self, event):
+        string_to_hash = event.user + event.text
+        return hashlib.md5(string_to_hash.encode("utf-8")).hexdigest()
 
     def handle_message(self, event: Event):
         if event.text == EventType.RELOAD_USERS:
@@ -73,6 +75,11 @@ class EventHandler:
             self._show_leaderboard(event)
         else:
             self._update_karma(event)
+
+    def log_message(self, event: Event):
+        self.event_history_table.put_item(
+            Item={"id": self._compute_hash(event), "ts": event.ts}
+        )
 
     def _reload_users(self, event):
         users = self.slack_api.get_slack_users_list()
