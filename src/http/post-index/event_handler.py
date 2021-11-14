@@ -1,4 +1,5 @@
 import re
+import hashlib
 import arc.tables
 
 from enum import Enum
@@ -29,6 +30,19 @@ class EventHandler:
         is_message = event.type == "message"
         is_from_human = event.subtype != "bot_message" and not event.bot_id
         return is_message and is_from_human
+
+    def duplicate_message(self, event: Event):
+        # Compute hash (user + text)
+        string_to_hash = event.user + event.text
+        computed_hash = hashlib.md5(string_to_hash.encode("utf-8")).hexdigest()
+        print(f"computed_hash: {computed_hash}")
+
+        # Check if event already occurred
+        event_history_table = arc.tables.table(tablename="events")
+        item = event_history_table.get_item(Key={"id": "1"})
+        print(f"item: {item}")
+
+        # if yes, was is in the last 500ms?
 
     def handle_message(self, event: Event):
         if event.text == EventType.RELOAD_USERS:

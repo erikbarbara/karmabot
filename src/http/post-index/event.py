@@ -9,3 +9,4 @@ class Event:
     subtype: str = field(default="")
     text: str = field(default="")
     user: str = field(default="")
+    ts: str = field(default="")
