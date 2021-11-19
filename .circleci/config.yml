@@ -5,6 +5,19 @@ orbs:
   slack: circleci/slack@3.4.2
 
 jobs:
+  run-tests:
+    docker:
+      - image: cimg/node:16.5
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: |
+            pip install -r requirements.txt
+      - run:
+          name: Run Tests
+          command: |
+            python -m unittest discover
   build-and-deploy:
     docker:
       - image: cimg/node:16.5
@@ -40,3 +53,4 @@ workflows:
             branches:
               only:
                 - master
+      - run-tests
