@@ -4,8 +4,8 @@ import hashlib
 import datetime
 from enum import Enum
 from random import randrange
-from .event import Event
-from .user import User
+from event import Event
+from user import User
 
 
 class EventType(Enum):
