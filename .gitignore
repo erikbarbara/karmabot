@@ -3,3 +3,4 @@ sam.*
 .vscode
 node_modules/
 preferences.arc
+__pycache__

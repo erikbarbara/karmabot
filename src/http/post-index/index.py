@@ -1,5 +1,6 @@
 import base64
 import json
+import arc.tables
 
 from event import Event
 from event_handler import EventHandler
@@ -8,7 +9,12 @@ from slack_api import SlackApi
 
 def handler(request, context):
     slack_api = SlackApi()
-    event_handler = EventHandler(slack_api)
+    event_handler = EventHandler(
+        slack_api,
+        user_table=arc.tables.table(tablename="users"),
+        karma_table=arc.tables.table(tablename="karma"),
+        event_history_table=arc.tables.table(tablename="events"),
+    )
     request_body = get_request_body(request)
 
     try:
@@ -25,16 +31,13 @@ def handler(request, context):
             # return {"statusCode": 409}
 
         if not event_handler.valid_message(event):
-            print("here [event_handler.valid_message]")
             return {"statusCode": "400"}
 
-        print("calling handle_message")
         event_handler.handle_message(event)
         event_handler.log_message(event)
 
         return {"statusCode": "200"}
     except Exception as error:
-        print(f"error: {error}")
         return {"statusCode": "400"}
 
 
@@ -49,7 +52,6 @@ def get_request_body(request):
 def make_event(request_body):
     request_body = json.loads(request_body)
     event = request_body.get("event", {})
-    print(f"event: {event}")
 
     return Event(
         bot_id=event.get("bot_id"),
