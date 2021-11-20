@@ -1,10 +1,10 @@
 import unittest
-from event_handler import EventHandler
+from . import event_handler
 
 
 class TestEventHandler(unittest.TestCase):
     def setUp(self):
-        self.event_handler = EventHandler()
+        self.event_handler = event_handler.EventHandler()
 
     def test_delta_simple_parsing(self):
         self.assertEqual(1, self.event_handler._get_delta("test.user ++"))
