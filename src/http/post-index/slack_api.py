@@ -66,7 +66,6 @@ class SlackApi:
         return users
 
     def post_slack_message(self, channel, text):
-        print("called post_slack_message")
         data = {
             "channel": channel,
             "text": text,

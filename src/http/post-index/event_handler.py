@@ -1,6 +1,5 @@
 import re
 import hashlib
-import arc.tables
 
 import datetime
 from enum import Enum
@@ -18,14 +17,19 @@ class EventType(Enum):
 
 
 class EventHandler:
-    def __init__(self, slack_api):
+    def __init__(
+        self,
+        slack_api=None,
+        user_table=None,
+        karma_table=None,
+        event_history_table=None,
+    ):
         self.slack_api = slack_api
-        self.users_table = arc.tables.table(tablename="users")
-        self.karma_table = arc.tables.table(tablename="karma")
-        self.event_history_table = arc.tables.table(tablename="events")
+        self.users_table = user_table
+        self.karma_table = karma_table
+        self.event_history_table = event_history_table
 
     def valid_message(self, event: Event):
-        print(f"valid_message event: {event}")
         if not event.text:
             return False
 
@@ -37,11 +41,9 @@ class EventHandler:
     def duplicate_message(self, event: Event):
         # https://aws.amazon.com/premiumsupport/knowledge-center/lambda-function-idempotent/
         computed_hash = self._compute_hash(event)
-        print(f"computed_hash: {computed_hash}")
 
         # Check if event already occurred
         ddb_item = self.event_history_table.get_item(Key={"id": computed_hash})
-        print(f"item: {ddb_item}")
 
         if "Item" not in ddb_item:
             # no existing row
@@ -55,14 +57,10 @@ class EventHandler:
             seconds=30
         )
         event_timestamp = datetime.datetime.fromtimestamp(float(event.ts))
-        print(f"db_event_timestamp: {db_event_timestamp}")
-        print(f"db_event_treshold_timestamp: {db_event_treshold_timestamp}")
-        print(f"event_timestamp: {event_timestamp}")
 
         is_duplicate = (
             db_event_timestamp <= event_timestamp <= db_event_treshold_timestamp
         )
-        print(f"is_duplicate: {is_duplicate}")
         return is_duplicate
 
     def _compute_hash(self, event):
@@ -152,15 +150,13 @@ class EventHandler:
 
     def _get_delta(self, text):
         delta = 1
-        # match negative karma (--)
-        if re.findall(r"\s?\-\-$", text):
+        if "--" in text:
             delta = -1
         return delta
 
     def _get_user_string(self, text):
-        text = text.replace(" ", "")
-        text = text.replace("++", "").replace("--", "")
-        return text
+        user, _ = re.split("\+\+|\-\-", text)
+        return user.strip()
 
     def _get_user(self, user_text):
         return self.users_table.get_item(Key={"id": user_text})
