@@ -111,7 +111,7 @@ def handler(req, context):
     event_timestamp = event.get('ts', None)
     event_id = f'{event_channel}-{event_timestamp}'
     
-    # only respond to messages, that also aren't from bots, and that do contains ++ or --
+    # only respond to messages that aren't from bots, and that contain ++
     if event_type == 'message' and (event_subtype != 'bot_message' and not event_bot_id):
         events_table = arc.tables.table(tablename='events')
         ddb_event = events_table.get_item(Key={'id': event_id})
