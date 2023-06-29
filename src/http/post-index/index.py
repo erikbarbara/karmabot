@@ -122,13 +122,11 @@ def handler(req, context):
             }
             events_table.put_item(Item=item)
 
-            event_text_matches = [re.sub('\"|“|”', '', m[0]) for m in re.findall(r'((\S+|".*"|“.*”)[ ]?(\+\+|--))', str(event_text))]
+            event_text_matches = [re.sub('\"|“|”', '', m[0]) for m in re.findall(r'((\S+|".*"|“.*”)[ ]?(\+\+))', str(event_text))]
             if event_text_matches:
                 for i in event_text_matches:
                     delta = 1
-                    if i.endswith('--'):
-                        delta = -1
-                    i = re.sub(' ?((\+\+)|(\-\-))', '', i)
+                    i = re.sub(' ?(\+\+)', '', i)
 
                     # look up potential users
                     if is_slack_user_id(i):
